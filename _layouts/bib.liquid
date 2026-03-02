@@ -1,7 +1,17 @@
 ---
 ---
 <!-- _layouts/bib.html -->
-<div class="row">
+{% assign first_author = entry.author_array | first %}
+{% assign first_author_is_self = false %}
+{% if first_author %}
+  {% assign first_author_last = first_author.last | remove: '¶' | remove: '&' | remove: '*' | remove: '†' | remove: '^' %}
+  {% if site.scholar.last_name contains first_author_last %}
+    {% if site.scholar.first_name contains first_author.first %}
+      {% assign first_author_is_self = true %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+<div class="row{% if first_author_is_self %} first-author-entry{% endif %}">
   {% if site.enable_publication_thumbnails %}
     <div class="col-sm-2 {% if entry.preview %}preview{% else %}abbr{% endif %}">
       {% if entry.preview %}
@@ -161,6 +171,11 @@
       {% endif %}
       {% if entry.arxiv %}
         <a href="http://arxiv.org/abs/{{ entry.arxiv }}" class="btn btn-sm z-depth-0" role="button">arXiv</a>
+      {% elsif entry.eprint and entry.archivePrefix == 'arXiv' %}
+        <a href="http://arxiv.org/abs/{{ entry.eprint }}" class="btn btn-sm z-depth-0" role="button">arXiv</a>
+      {% endif %}
+      {% if entry.adsurl %}
+        <a href="{{ entry.adsurl }}" class="btn btn-sm z-depth-0" role="button">ADS</a>
       {% endif %}
       {% if entry.bibtex_show %}
         <a class="bibtex btn btn-sm z-depth-0" role="button">Bib</a>
